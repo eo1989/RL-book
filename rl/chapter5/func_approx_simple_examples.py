@@ -29,8 +29,7 @@ def data_seq_generator(
     num_pts: int
 ) -> Iterator[DataSeq]:
     while True:
-        pts: DataSeq = list(islice(data_generator, num_pts))
-        yield pts
+        yield list(islice(data_generator, num_pts))
 
 
 def feature_functions():

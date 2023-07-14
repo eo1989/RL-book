@@ -10,8 +10,7 @@ wg = WindyGrid(
     wind=[(0., 0.9), (0.0, 0.8), (0.7, 0.0), (0.8, 0.0), (0.9, 0.0)],
     bump_cost=100000.0
 )
-valid = wg.validate_spec()
-if valid:
+if valid := wg.validate_spec():
     fmdp: FiniteMarkovDecisionProcess[Cell, Move] = wg.get_finite_mdp()
     compare_mc_sarsa_ql(
         fmdp=fmdp,

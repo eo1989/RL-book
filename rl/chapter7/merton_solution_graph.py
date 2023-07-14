@@ -32,11 +32,11 @@ class MertonPortfolio:
     def f(self, time: float) -> float:
         remaining: float = self.horizon - time
         nu = self.nu()
-        if nu == 0:
-            ret = remaining + self.epsilon
-        else:
-            ret = (1 + (nu * self.epsilon - 1) * exp(-nu * remaining)) / nu
-        return ret
+        return (
+            remaining + self.epsilon
+            if nu == 0
+            else (1 + (nu * self.epsilon - 1) * exp(-nu * remaining)) / nu
+        )
 
     def fractional_consumption_rate(self, time: float) -> float:
         return 1 / self.f(time)
@@ -47,13 +47,16 @@ class MertonPortfolio:
     def expected_wealth(self, time: float) -> float:
         base: float = exp(self.portfolio_return() * time)
         nu = self.nu()
-        if nu == 0:
-            ret = base * (1 - time / (self.horizon + self.epsilon))
-        else:
-            ret = base * (1 - (1 - exp(-nu * time)) /
-                          (1 + (nu * self.epsilon - 1) *
-                           exp(-nu * self.horizon)))
-        return ret
+        return (
+            base * (1 - time / (self.horizon + self.epsilon))
+            if nu == 0
+            else base
+            * (
+                1
+                - (1 - exp(-nu * time))
+                / (1 + (nu * self.epsilon - 1) * exp(-nu * self.horizon))
+            )
+        )
 
 
 if __name__ == '__main__':

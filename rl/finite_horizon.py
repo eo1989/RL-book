@@ -111,13 +111,16 @@ def evaluate(
 
     v: List[V[S]] = []
 
-    for step in reversed(steps):
-        v.append({s: res.expectation(
-            lambda s_r: s_r[1] + gamma * (
-                extended_vf(v[-1], s_r[0]) if len(v) > 0 else 0.
+    v.extend(
+        {
+            s: res.expectation(
+                lambda s_r: s_r[1]
+                + gamma * (extended_vf(v[-1], s_r[0]) if v else 0.0)
             )
-        ) for s, res in step.items()})
-
+            for s, res in step.items()
+        }
+        for step in reversed(steps)
+    )
     return reversed(v)
 
 
@@ -205,11 +208,25 @@ def optimal_vf_and_policy(
         this_v: Dict[NonTerminal[S], float] = {}
         this_a: Dict[S, A] = {}
         for s, actions_map in step.items():
-            action_values = ((res.expectation(
-                lambda s_r: s_r[1] + gamma * (
-                    extended_vf(v_p[-1][0], s_r[0]) if len(v_p) > 0 else 0.
+            action_values = (
+                (
+                    res.expectation(
+                        lambda s_r: (
+                            s_r[1]
+                            + (
+                                gamma
+                                * (
+                                    extended_vf(v_p[-1][0], s_r[0])
+                                    if v_p
+                                    else 0.0
+                                )
+                            )
+                        )
+                    ),
+                    a,
                 )
-            ), a) for a, res in actions_map.items())
+                for a, res in actions_map.items()
+            )
             v_star, a_star = max(action_values, key=itemgetter(0))
             this_v[s] = v_star
             this_a[s.state] = a_star

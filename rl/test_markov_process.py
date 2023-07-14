@@ -88,7 +88,7 @@ class TestMarkovProcess(unittest.TestCase):
         longer_trace = itertools.islice(
             self.flip_flop.simulate(Constant(NonTerminal(True))), 10000
         )
-        count_trues = len(list(outcome for outcome in longer_trace if outcome.state))
+        count_trues = len([outcome for outcome in longer_trace if outcome.state])
 
         # If the code is correct, this should fail with a vanishingly
         # small probability
@@ -111,7 +111,7 @@ class TestFiniteMarkovProcess(unittest.TestCase):
         longer_trace = itertools.islice(
             self.flip_flop.simulate(Constant(NonTerminal(True))), 10000
         )
-        count_trues = len(list(outcome for outcome in longer_trace if outcome.state))
+        count_trues = len([outcome for outcome in longer_trace if outcome.state])
 
         # If the code is correct, this should fail with a vanishingly
         # small probability

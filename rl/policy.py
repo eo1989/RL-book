@@ -102,7 +102,6 @@ class FiniteDeterministicPolicy(FinitePolicy[S, A]):
                                      self.action_for.items()})
 
     def __repr__(self) -> str:
-        display = ""
-        for s, a in self.action_for.items():
-            display += f"For State {s}: Do Action {a}\n"
-        return display
+        return "".join(
+            f"For State {s}: Do Action {a}\n" for s, a in self.action_for.items()
+        )

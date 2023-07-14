@@ -24,10 +24,7 @@ class State(ABC, Generic[S]):
         f: Callable[[NonTerminal[S]], X],
         default: X
     ) -> X:
-        if isinstance(self, NonTerminal):
-            return f(self)
-        else:
-            return default
+        return f(self) if isinstance(self, NonTerminal) else default
 
 
 @dataclass(frozen=True)

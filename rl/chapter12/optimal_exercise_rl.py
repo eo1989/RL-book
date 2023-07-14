@@ -41,9 +41,9 @@ def training_sim_data(
     ret: List[TrainingDataType] = []
     dt: float = expiry / num_steps
     spot: float = spot_price
-    vol2: float = vol * vol
+    vol2: float = vol**2
 
-    mean2: float = spot * spot
+    mean2: float = spot**2
     var: float = mean2 * spot_price_frac * spot_price_frac
     log_mean: float = np.log(mean2 / np.sqrt(var + mean2))
     log_stdev: float = np.sqrt(np.log(var / mean2 + 1))
@@ -221,7 +221,7 @@ def scoring_sim_data(
 ) -> np.ndarray:
     paths: np.ndarray = np.empty([num_paths, num_steps + 1])
     dt: float = expiry / num_steps
-    vol2: float = vol * vol
+    vol2: float = vol**2
     for i in range(num_paths):
         paths[i, 0] = spot_price
         for step in range(num_steps):
@@ -358,7 +358,7 @@ if __name__ == '__main__':
 
     print("Fitted DQL Model")
 
-    for step in [0, int(num_steps_lspi / 2), num_steps_lspi - 1]:
+    for step in [0, num_steps_lspi // 2, num_steps_lspi - 1]:
         t = step * expiry_val / num_steps_lspi
         prices = np.arange(120.0)
         exer_curve = exercise_curve(
@@ -382,7 +382,7 @@ if __name__ == '__main__':
         plt.title(f"LSPI Curves for Time = {t:.3f}")
         plt.show()
 
-    for step in [0, int(num_steps_dql / 2), num_steps_dql - 1]:
+    for step in [0, num_steps_dql // 2, num_steps_dql - 1]:
         t = step * expiry_val / num_steps_dql
         prices = np.arange(120.0)
         exer_curve = exercise_curve(

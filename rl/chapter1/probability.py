@@ -22,10 +22,7 @@ class OldDie(Distribution):
         return f"Die(sides={self.sides})"
 
     def __eq__(self, other):
-        if isinstance(other, Die):
-            return self.sides == other.sides
-
-        return False
+        return self.sides == other.sides if isinstance(other, Die) else False
 
     def sample(self) -> int:
         return random.randint(1, self.sides)

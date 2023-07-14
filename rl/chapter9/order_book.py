@@ -72,49 +72,47 @@ class OrderBook:
             []
         )
 
-    def sell_limit_order(self, price: float, shares: int) -> \
-            Tuple[DollarsAndShares, OrderBook]:
+    def sell_limit_order(self, price: float, shares: int) -> Tuple[DollarsAndShares, OrderBook]:
         index: Optional[int] = next((i for i, d_s
                                      in enumerate(self.descending_bids)
                                      if d_s.dollars < price), None)
         eligible_bids: PriceSizePairs = self.descending_bids \
-            if index is None else self.descending_bids[:index]
+                if index is None else self.descending_bids[:index]
         ineligible_bids: PriceSizePairs = [] if index is None else \
-            self.descending_bids[index:]
+                self.descending_bids[index:]
 
         d_s, rem_bids = OrderBook.eat_book(eligible_bids, shares)
         new_bids: PriceSizePairs = list(rem_bids) + list(ineligible_bids)
         rem_shares: int = shares - d_s.shares
 
-        if rem_shares > 0:
-            new_asks: List[DollarsAndShares] = list(self.ascending_asks)
-            index1: Optional[int] = next((i for i, d_s
-                                          in enumerate(new_asks)
-                                          if d_s.dollars >= price), None)
-            if index1 is None:
-                new_asks.append(DollarsAndShares(
-                    dollars=price,
-                    shares=rem_shares
-                ))
-            elif new_asks[index1].dollars != price:
-                new_asks.insert(index1, DollarsAndShares(
-                    dollars=price,
-                    shares=rem_shares
-                ))
-            else:
-                new_asks[index1] = DollarsAndShares(
-                    dollars=price,
-                    shares=new_asks[index1].shares + rem_shares
-                )
-            return d_s, OrderBook(
-                ascending_asks=new_asks,
-                descending_bids=new_bids
-            )
-        else:
+        if rem_shares <= 0:
             return d_s, replace(
                 self,
                 descending_bids=new_bids
             )
+        new_asks: List[DollarsAndShares] = list(self.ascending_asks)
+        index1: Optional[int] = next((i for i, d_s
+                                      in enumerate(new_asks)
+                                      if d_s.dollars >= price), None)
+        if index1 is None:
+            new_asks.append(DollarsAndShares(
+                dollars=price,
+                shares=rem_shares
+            ))
+        elif new_asks[index1].dollars != price:
+            new_asks.insert(index1, DollarsAndShares(
+                dollars=price,
+                shares=rem_shares
+            ))
+        else:
+            new_asks[index1] = DollarsAndShares(
+                dollars=price,
+                shares=new_asks[index1].shares + rem_shares
+            )
+        return d_s, OrderBook(
+            ascending_asks=new_asks,
+            descending_bids=new_bids
+        )
 
     def sell_market_order(
         self,

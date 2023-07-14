@@ -233,7 +233,7 @@ def main(
     if index and to == "pdf":
         with tempfile.TemporaryDirectory() as tmp:
             shutil.copytree("book", os.path.join(tmp, "book"))
-            tmp_out = os.path.join(tmp, "book", f"tmp.tex")
+            tmp_out = os.path.join(tmp, "book", "tmp.tex")
 
             run_pandoc(
                 target, out=tmp_out, to="latex", tf_format=tf_format, index=index

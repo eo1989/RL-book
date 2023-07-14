@@ -105,7 +105,6 @@ class SimpleInventoryStochasticPolicy(Policy[InventoryState, int]):
 
 
 if __name__ == '__main__':
-    user_poisson_lambda = 2.0
     user_holding_cost = 1.0
     user_stockout_cost = 10.0
 
@@ -115,6 +114,7 @@ if __name__ == '__main__':
     user_time_steps = 1000
     user_num_traces = 1000
 
+    user_poisson_lambda = 2.0
     si_mdp_nocap = SimpleInventoryMDPNoCap(poisson_lambda=user_poisson_lambda,
                                            holding_cost=user_holding_cost,
                                            stockout_cost=user_stockout_cost)
@@ -127,8 +127,7 @@ if __name__ == '__main__':
                                                     time_steps=user_time_steps,
                                                     num_traces=user_num_traces)
     print(
-        f"Deterministic Policy yields {oos_frac_dp * 100:.2f}%"
-        + " of Out-Of-Stock days"
+        f"Deterministic Policy yields {oos_frac_dp * 100:.2f}% of Out-Of-Stock days"
     )
 
     si_sp = SimpleInventoryStochasticPolicy(
@@ -138,6 +137,5 @@ if __name__ == '__main__':
                                                     time_steps=user_time_steps,
                                                     num_traces=user_num_traces)
     print(
-        f"Stochastic Policy yields {oos_frac_sp * 100:.2f}%"
-        + " of Out-Of-Stock days"
+        f"Stochastic Policy yields {oos_frac_sp * 100:.2f}% of Out-Of-Stock days"
     )
