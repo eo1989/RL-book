@@ -17,7 +17,7 @@ init_wealth_stdev: float = 0.1
 policy_stdev: float = 0.5
 
 excess: float = μ - r
-var: float = σ * σ
+var: float = σ**2
 base_alloc: float = excess / (a * var)
 
 print("Analytical Solution")

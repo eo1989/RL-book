@@ -39,26 +39,29 @@ class OptimalExerciseBI:
         r: float = self.rate
         s: float = self.vol
 
+
+
         class OptExerciseBIMDP(MarkovDecisionProcess[float, bool]):
 
             def step(
-                self,
-                price: NonTerminal[float],
-                exer: bool
-            ) -> SampledDistribution[Tuple[State[float], float]]:
+                        self,
+                        price: NonTerminal[float],
+                        exer: bool
+                    ) -> SampledDistribution[Tuple[State[float], float]]:
 
                 def sr_sampler_func(
-                    price=price,
-                    exer=exer
-                ) -> Tuple[State[float], float]:
+                                price=price,
+                                exer=exer
+                            ) -> Tuple[State[float], float]:
                     if exer:
                         return Terminal(0.), exer_payoff(price.state)
-                    else:
-                        next_price: float = np.exp(np.random.normal(
-                            np.log(price.state) + (r - s * s / 2) * dt,
-                            s * np.sqrt(dt)
-                        ))
-                        return NonTerminal(next_price), 0.
+                    next_price: float = np.exp(
+                        np.random.normal(
+                            np.log(price.state) + (r - s**2 / 2) * dt,
+                            s * np.sqrt(dt),
+                        )
+                    )
+                    return NonTerminal(next_price), 0.
 
                 return SampledDistribution(
                     sampler=sr_sampler_func,
@@ -67,6 +70,7 @@ class OptimalExerciseBI:
 
             def actions(self, price: NonTerminal[float]) -> Sequence[bool]:
                 return [True, False]
+
 
         return OptExerciseBIMDP()
 
@@ -216,7 +220,7 @@ if __name__ == '__main__':
         print(f"Time {t:d}")
         print()
 
-        if t == 0 or t == int(num_steps_val / 2) or t == num_steps_val - 1:
+        if t in [0, num_steps_val // 2, num_steps_val - 1]:
             exer_curve: np.ndarray = opt_ex_bi.exercise_curve(
                 prices=prices
             )

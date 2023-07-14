@@ -27,14 +27,13 @@ class AMS(Generic[S, A]):
         self.num_samples: Sequence[int] = num_samples
         self.gamma: float = gamma
 
-    def optimal_vf_and_policy(self, t: int, s: S) -> \
-            Tuple[float, A]:
+    def optimal_vf_and_policy(self, t: int, s: S) -> Tuple[float, A]:
 
         actions: Set[A] = self.actions_funcs[t](s)
         state_distr_func: Callable[[S, A], Distribution[S]] = \
-            self.state_distr_funcs[t]
+                self.state_distr_funcs[t]
         expected_reward_func: Callable[[S, A], float] = \
-            self.expected_reward_funcs[t]
+                self.expected_reward_funcs[t]
         # sample each action once, sample each action's next state, and
         # recursively call the next state's V* estimate
         rewards: Mapping[A, float] = {a: expected_reward_func(s, a)
@@ -50,7 +49,7 @@ class AMS(Generic[S, A]):
             # determine the actions that dominate on the UCB Q* estimated value
             # and pick one of these dominating actions at random, call it a*
             ucb_vals: Mapping[A, float] = \
-                {a: rewards[a] + self.gamma * val_sums[a] / counts[a] +
+                    {a: rewards[a] + self.gamma * val_sums[a] / counts[a] +
                  np.sqrt(2 * np.log(i) / counts[a]) for a in actions}
             max_actions: Sequence[A] = [a for a, u in ucb_vals.items()
                                         if u == max(ucb_vals.values())]
@@ -66,14 +65,19 @@ class AMS(Generic[S, A]):
         # return estimated V* as weighted average of the estimated Q* where
         # weights are proportioned by the number of times an action was sampled
         return (
-            sum(counts[a] / self.num_samples[t] *
-                (rewards[a] + self.gamma * val_sums[a] / counts[a])
-                for a in actions),
+            sum(
+                counts[a]
+                / self.num_samples[t]
+                * (rewards[a] + self.gamma * val_sums[a] / counts[a])
+                for a in actions
+            ),
             max(
-                [(a, rewards[a] + self.gamma * val_sums[a] / counts[a])
-                 for a in actions],
-                key=itemgetter(1)
-            )[0]
+                (
+                    (a, rewards[a] + self.gamma * val_sums[a] / counts[a])
+                    for a in actions
+                ),
+                key=itemgetter(1),
+            )[0],
         )
 
 

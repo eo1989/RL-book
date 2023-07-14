@@ -184,13 +184,12 @@ class Dynamic(FunctionApprox[X]):
     values_map: Mapping[X, float]
 
     def __add__(self, other: Dynamic[X]) -> Dynamic[X]:
-        d: Dict[X, float] = {}
-        for key in set.union(
-            set(self.values_map.keys()),
-            set(other.values_map.keys())
-        ):
-            d[key] = self.values_map.get(key, 0.) + \
-                other.values_map.get(key, 0.)
+        d: Dict[X, float] = {
+            key: self.values_map.get(key, 0.0) + other.values_map.get(key, 0.0)
+            for key in set.union(
+                set(self.values_map.keys()), set(other.values_map.keys())
+            )
+        }
         return Dynamic(values_map=d)
 
     def __mul__(self, scalar: float) -> Dynamic[X]:
@@ -205,9 +204,7 @@ class Dynamic(FunctionApprox[X]):
     ) -> Gradient[Dynamic[X]]:
         x_vals, y_vals = zip(*xy_vals_seq)
         obj_deriv_out: np.ndarray = obj_deriv_out_fun(x_vals, y_vals)
-        d: Dict[X, float] = {}
-        for x, o in zip(x_vals, obj_deriv_out):
-            d[x] = o
+        d: Dict[X, float] = dict(zip(x_vals, obj_deriv_out))
         return Gradient(Dynamic(values_map=d))
 
     def evaluate(self, x_values_seq: Iterable[X]) -> np.ndarray:
@@ -676,9 +673,9 @@ class DNNApprox(FunctionApprox[X]):
         weights: Optional[Sequence[Weights]] = None
     ) -> DNNApprox[X]:
         if weights is None:
-            inputs: Sequence[int] = [len(feature_functions)] + \
-                [n + (1 if dnn_spec.bias else 0)
-                 for i, n in enumerate(dnn_spec.neurons)]
+            inputs: Sequence[int] = [len(feature_functions)] + [
+                n + (1 if dnn_spec.bias else 0) for n in dnn_spec.neurons
+            ]
             outputs: Sequence[int] = list(dnn_spec.neurons) + [1]
             wts = [Weights.create(
                 weights=np.random.randn(output, inp) / np.sqrt(inp),
@@ -717,10 +714,7 @@ class DNNApprox(FunctionApprox[X]):
             out: np.ndarray = self.dnn_spec.hidden_activation(
                 np.dot(inp, w.weights.T)
             )
-            if self.dnn_spec.bias:
-                inp = np.insert(out, 0, 1., axis=1)
-            else:
-                inp = out
+            inp = np.insert(out, 0, 1., axis=1) if self.dnn_spec.bias else out
             ret.append(inp)
         ret.append(
             self.dnn_spec.output_activation(

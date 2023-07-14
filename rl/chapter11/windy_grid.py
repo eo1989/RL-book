@@ -233,8 +233,7 @@ if __name__ == '__main__':
         wind=[(0., 0.9), (0.0, 0.8), (0.7, 0.0), (0.8, 0.0), (0.9, 0.0)],
         bump_cost=4.0
     )
-    valid = wg.validate_spec()
-    if valid:
+    if valid := wg.validate_spec():
         wg.print_wind_and_bumps()
         vi_vf_dict, vi_policy = wg.get_vi_vf_and_policy()
         print("Value Iteration\n")

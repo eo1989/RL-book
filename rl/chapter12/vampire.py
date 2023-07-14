@@ -59,18 +59,14 @@ class VampireMDP(FiniteMarkovDecisionProcess[int, int]):
 
     def lspi_transitions(self) -> Iterator[TransitionStep[int, int]]:
         states_distribution: Choose[NonTerminal[int]] = \
-            Choose(self.non_terminal_states)
+                Choose(self.non_terminal_states)
         while True:
             state: NonTerminal[int] = states_distribution.sample()
             action: int = Choose(range(state.state)). sample()
             next_state, reward = self.step(state, action).sample()
-            transition: TransitionStep[int, int] = TransitionStep(
-                state=state,
-                action=action,
-                next_state=next_state,
-                reward=reward
+            yield TransitionStep(
+                state=state, action=action, next_state=next_state, reward=reward
             )
-            yield transition
 
     def lspi_vf_and_policy(self) -> \
             Tuple[V[int], FiniteDeterministicPolicy[int, int]]:

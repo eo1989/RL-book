@@ -186,9 +186,9 @@ class WindyGrid:
         and with output as a sampled pair of (next_state, reward).
         '''
         q: Dict[Cell, Dict[Move, float]] = \
-            {s: {a: 0. for a in actions} for s, actions in
+                {s: {a: 0. for a in actions} for s, actions in
              states_actions_dict.items()}
-        nt_states: CellSet = {s for s in q}
+        nt_states: CellSet = set(q)
         uniform_states: Choose[Cell] = Choose(nt_states)
         for episode_num in range(episodes):
             epsilon: float = 1.0 / (episode_num + 1)
@@ -202,7 +202,7 @@ class WindyGrid:
         vf_dict: V[Cell] = {NonTerminal(s): max(d.values()) for s, d
                             in q.items()}
         policy: FiniteDeterministicPolicy[Cell, Move] = \
-            FiniteDeterministicPolicy(
+                FiniteDeterministicPolicy(
                 {s: max(d.items(), key=itemgetter(1))[0] for s, d in q.items()}
             )
         return vf_dict, policy
@@ -222,11 +222,11 @@ class WindyGrid:
         and with output as a sampled pair of (next_state, reward).
         '''
         q: Dict[Cell, Dict[Move, float]] = \
-            {s: {a: 0. for a in actions} for s, actions in
+                {s: {a: 0. for a in actions} for s, actions in
              states_actions_dict.items()}
-        nt_states: CellSet = {s for s in q}
+        nt_states: CellSet = set(q)
         uniform_states: Choose[Cell] = Choose(nt_states)
-        for episode_num in range(episodes):
+        for _ in range(episodes):
             state: Cell = uniform_states.sample()
             '''
             write your code here
@@ -237,7 +237,7 @@ class WindyGrid:
         vf_dict: V[Cell] = {NonTerminal(s): max(d.values()) for s, d
                             in q.items()}
         policy: FiniteDeterministicPolicy[Cell, Move] = \
-            FiniteDeterministicPolicy(
+                FiniteDeterministicPolicy(
                 {s: max(d.items(), key=itemgetter(1))[0] for s, d in q.items()}
             )
         return (vf_dict, policy)

@@ -34,16 +34,14 @@ class GradientBandits(MABBase):
             exp_scores: Sequence[float] = [exp(s - max_score) for s in scores]
             sum_exp_scores = sum(exp_scores)
             probs: Sequence[float] = [s / sum_exp_scores for s in exp_scores]
-            action: int = Categorical(
-                {i: p for i, p in enumerate(probs)}
-            ).sample()
+            action: int = Categorical(dict(enumerate(probs))).sample()
             reward: float = self.arm_distributions[action].sample()
             avg_reward += (reward - avg_reward) / (i + 1)
             step_size: float = self.learning_rate *\
-                (i / self.learning_rate_decay + 1) ** -0.5
+                    (i / self.learning_rate_decay + 1) ** -0.5
             for j in range(self.num_arms):
                 scores[j] += step_size * (reward - avg_reward) *\
-                             ((1 if j == action else 0) - probs[j])
+                                 ((1 if j == action else 0) - probs[j])
 
             ep_rewards[i] = reward
             ep_actions[i] = action

@@ -23,15 +23,15 @@ class OptimalExerciseBinTree:
         sigma_sqrt: float = self.vol * np.sqrt(self.expiry)
         d1: float = (np.log(self.spot_price / strike) +
                      (self.rate + self.vol ** 2 / 2.) * self.expiry) \
-            / sigma_sqrt
+                / sigma_sqrt
         d2: float = d1 - sigma_sqrt
-        if is_call:
-            ret = self.spot_price * norm.cdf(d1) - \
-                strike * np.exp(-self.rate * self.expiry) * norm.cdf(d2)
-        else:
-            ret = strike * np.exp(-self.rate * self.expiry) * norm.cdf(-d2) - \
-                self.spot_price * norm.cdf(-d1)
-        return ret
+        return (
+            self.spot_price * norm.cdf(d1)
+            - strike * np.exp(-self.rate * self.expiry) * norm.cdf(d2)
+            if is_call
+            else strike * np.exp(-self.rate * self.expiry) * norm.cdf(-d2)
+            - self.spot_price * norm.cdf(-d1)
+        )
 
     def dt(self) -> float:
         return self.expiry / self.num_steps
@@ -40,12 +40,10 @@ class OptimalExerciseBinTree:
         return self.spot_price * np.exp((2 * j - i) * self.vol *
                                         np.sqrt(self.dt()))
 
-    def get_opt_vf_and_policy(self) -> \
-            Iterator[Tuple[V[int], FiniteDeterministicPolicy[int, bool]]]:
+    def get_opt_vf_and_policy(self) -> Iterator[Tuple[V[int], FiniteDeterministicPolicy[int, bool]]]:
         dt: float = self.dt()
         up_factor: float = np.exp(self.vol * np.sqrt(dt))
-        up_prob: float = (np.exp(self.rate * dt) * up_factor - 1) / \
-            (up_factor * up_factor - 1)
+        up_prob: float = (np.exp(self.rate * dt) * up_factor - 1) / (up_factor**2 - 1)
         return optimal_vf_and_policy(
             steps=[
                 {NonTerminal(j): {
@@ -75,10 +73,12 @@ class OptimalExerciseBinTree:
         dt: float = self.dt()
         ex_boundary: List[Tuple[float, float]] = []
         for i in range(self.num_steps + 1):
-            ex_points = [j for j in range(i + 1)
-                         if policy_seq[i].action_for[j] and
-                         self.payoff(i * dt, self.state_price(i, j)) > 0]
-            if len(ex_points) > 0:
+            if ex_points := [
+                j
+                for j in range(i + 1)
+                if policy_seq[i].action_for[j]
+                and self.payoff(i * dt, self.state_price(i, j)) > 0
+            ]:
                 boundary_pt = min(ex_points) if is_call else max(ex_points)
                 ex_boundary.append(
                     (i * dt, self.state_price(i, boundary_pt))

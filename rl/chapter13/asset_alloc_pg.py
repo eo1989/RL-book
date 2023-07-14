@@ -232,7 +232,7 @@ if __name__ == '__main__':
     policy_stdev: float = 0.5
 
     excess: float = μ - r
-    var: float = σ * σ
+    var: float = σ**2
     base_alloc: float = excess / (a * var)
 
     print("Analytical Solution")
@@ -354,12 +354,16 @@ if __name__ == '__main__':
                             )]
     plot_period: int = 200
     start: int = 50
-    x_vals = [[i * plot_period for i in
-               range(start, int(num_episodes / plot_period))]] * 4
-    y_vals = []
-    for y in [y0, y1, y2, y4]:
-        y_vals.append([np.mean(y[i * plot_period:(i + 1) * plot_period])
-                       for i in range(start, int(num_episodes / plot_period))])
+    x_vals = [
+        [i * plot_period for i in range(start, num_episodes // plot_period)]
+    ] * 4
+    y_vals = [
+        [
+            np.mean(y[i * plot_period : (i + 1) * plot_period])
+            for i in range(start, num_episodes // plot_period)
+        ]
+        for y in [y0, y1, y2, y4]
+    ]
     print(x_vals)
     print(y_vals)
 

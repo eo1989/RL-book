@@ -190,7 +190,7 @@ if __name__ == '__main__':
     init_wealth_stdev: float = 0.1
 
     excess: float = μ - r
-    var: float = σ * σ
+    var: float = σ**2
     base_alloc: float = excess / (a * var)
 
     risky_ret: Sequence[Gaussian] = [Gaussian(μ=μ, σ=σ) for _ in range(steps)]
@@ -279,8 +279,7 @@ if __name__ == '__main__':
         alloc: float = base_alloc / growth
         vval: float = - np.exp(- excess * excess * left / (2 * var)
                                - a * growth * (1 + r) * init_wealth) / a
-        bias_wt: float = excess * excess * (left - 1) / (2 * var) + \
-            np.log(np.abs(a))
+        bias_wt: float = (excess**2 * (left - 1) / (2 * var) + np.log(np.abs(a)))
         w_t_wt: float = a * growth * (1 + r)
         x_t_wt: float = a * excess * growth
         x_t2_wt: float = - var * (a * growth) ** 2 / 2

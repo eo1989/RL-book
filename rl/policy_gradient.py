@@ -48,11 +48,13 @@ def reinforce_gaussian(
         gamma_prod: float = 1.0
         for step in returns(trace, gamma, episode_length_tolerance):
             def obj_deriv_out(
-                states: Sequence[NonTerminal[S]],
-                actions: Sequence[float]
-            ) -> np.ndarray:
-                return (policy_mean_approx.evaluate(states) -
-                        np.array(actions)) / (policy_stdev * policy_stdev)
+                            states: Sequence[NonTerminal[S]],
+                            actions: Sequence[float]
+                        ) -> np.ndarray:
+                return (
+                    policy_mean_approx.evaluate(states) - np.array(actions)
+                ) / policy_stdev**2
+
             grad: Gradient[FunctionApprox[NonTerminal[S]]] = \
                 policy_mean_approx.objective_gradient(
                     xy_vals_seq=[(step.state, step.action)],
@@ -102,11 +104,12 @@ def actor_critic_gaussian(
                 q = q.update([((state, action), reward)])
 
             def obj_deriv_out(
-                states: Sequence[NonTerminal[S]],
-                actions: Sequence[float]
-            ) -> np.ndarray:
-                return (policy_mean_approx.evaluate(states) -
-                        np.array(actions)) / (policy_stdev * policy_stdev)
+                            states: Sequence[NonTerminal[S]],
+                            actions: Sequence[float]
+                        ) -> np.ndarray:
+                return (
+                    policy_mean_approx.evaluate(states) - np.array(actions)
+                ) / policy_stdev**2
 
             grad: Gradient[FunctionApprox[NonTerminal[S]]] = \
                 policy_mean_approx.objective_gradient(
@@ -163,11 +166,12 @@ def actor_critic_advantage_gaussian(
                 v = v.update([(state, reward)])
 
             def obj_deriv_out(
-                states: Sequence[NonTerminal[S]],
-                actions: Sequence[float]
-            ) -> np.ndarray:
-                return (policy_mean_approx.evaluate(states) -
-                        np.array(actions)) / (policy_stdev * policy_stdev)
+                            states: Sequence[NonTerminal[S]],
+                            actions: Sequence[float]
+                        ) -> np.ndarray:
+                return (
+                    policy_mean_approx.evaluate(states) - np.array(actions)
+                ) / policy_stdev**2
 
             grad: Gradient[FunctionApprox[NonTerminal[S]]] = \
                 policy_mean_approx.objective_gradient(
@@ -214,11 +218,12 @@ def actor_critic_td_error_gaussian(
             vf = vf.update([(state, td_target)])
 
             def obj_deriv_out(
-                states: Sequence[NonTerminal[S]],
-                actions: Sequence[float]
-            ) -> np.ndarray:
-                return (policy_mean_approx.evaluate(states) -
-                        np.array(actions)) / (policy_stdev * policy_stdev)
+                            states: Sequence[NonTerminal[S]],
+                            actions: Sequence[float]
+                        ) -> np.ndarray:
+                return (
+                    policy_mean_approx.evaluate(states) - np.array(actions)
+                ) / policy_stdev**2
 
             grad: Gradient[FunctionApprox[NonTerminal[S]]] = \
                 policy_mean_approx.objective_gradient(

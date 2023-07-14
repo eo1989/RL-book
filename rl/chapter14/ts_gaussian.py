@@ -23,7 +23,7 @@ class ThompsonSamplingGaussian(MABBase):
         self.theta0: float = init_mean
         self.n0: int = 1
         self.alpha0: float = 1
-        self.beta0: float = init_stdev * init_stdev
+        self.beta0: float = init_stdev**2
 
     def get_episode_rewards_actions(self) -> Tuple[ndarray, ndarray]:
         # Bayesian update based on the treatment in
